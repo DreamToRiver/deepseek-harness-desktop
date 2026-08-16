@@ -1,6 +1,18 @@
-# DeepSeek Harness 桌面应用
+# DeepSeek Harness Desktop
 
-把 DeepSeek Harness（DSH）打包成独立桌面软件，配 NSIS 安装向导（`setup.exe`）。
+DeepSeek Harness（DSH）的 Windows x64 桌面版。它使用 Electron 提供桌面窗口和系统托盘，并在安装包内置 DSH 服务与 Node.js 运行时，安装后即可直接使用。
+
+## 下载
+
+普通用户无需克隆源码或安装 Node.js，直接前往 [Releases](https://github.com/DreamToRiver/deepseek-harness-desktop/releases) 下载最新的 `DeepSeek-Harness-Setup-*.exe`。
+
+当前版本：[v0.1.1](https://github.com/DreamToRiver/deepseek-harness-desktop/releases/tag/v0.1.1)
+
+## 首次使用与 API Key
+
+首次启动时，应用会引导用户配置自己的 DeepSeek API Key。项目源码和安装包不包含开发者的 API Key；每位用户的配置保存在自己的 `%USERPROFILE%\.dsh` 目录中，并与 DSH 命令行版本共享。
+
+应用按以下顺序查找凭据：环境变量 `DEEPSEEK_API_KEY`、`%USERPROFILE%\.dsh\.credentials.yaml`、项目 `.env`、`%DSH_HOME%\.env`。仓库通过 `.gitignore` 排除凭据和环境文件。
 
 ## 架构
 
@@ -20,28 +32,31 @@
 ## 目录结构
 
 ```
-dsh-desktop/
-├── main.js            Electron 主进程
-├── package.json       应用清单 + electron-builder 配置
-├── build/icon.ico     应用图标（脚本生成）
-├── scripts/make-icon.mjs   图标生成脚本
-├── server/            内置 DSH 运行时（node.exe + node_modules，构建时复制）
-└── dist/              打包产物（setup.exe）
+├── main.js                Electron 主进程
+├── preload.js             安全的渲染进程桥接
+├── package.json           应用清单与 electron-builder 配置
+├── build/                 应用图标与 NSIS 安装向导资源
+├── scripts/               图标、构建和端到端测试脚本
+├── server/runtime/        内置 DSH 运行时（node.exe + node_modules）
+└── dist/                  本地构建产物（不会提交到仓库）
 ```
 
 ## 构建
 
-前置：已装好 DSH 依赖的 `node_modules`（当前来自 `D:\DeepSeek\deepseek-harness\node_modules`）。
+构建安装包需要 Node.js、npm 和网络连接；最终用户不需要预装这些环境。
 
 ```powershell
-# 1. 复制运行时到 server/（node.exe + node_modules）
-# 2. 安装打包工具
-npm install --save-dev electron electron-builder
-# 3. 生成图标
+# 安装项目依赖
+npm ci
+
+# 生成图标
 npm run icon
-# 4. 打包为安装包（产物在 dist/）
+
+# 打包为 Windows x64 安装包，产物在 dist/
 npm run dist
 ```
+
+仓库中的 `server/runtime` 已包含可独立运行的 DSH 后端及其依赖，不需要从开发者电脑复制文件。
 
 ## 系统要求（目标机器）
 
@@ -53,7 +68,7 @@ npm run dist
 
 ## 产物
 
-- `dist/DeepSeek-Harness-Setup-0.1.0.exe` —— NSIS 安装向导（每用户安装，无需管理员权限，可选择安装目录，自动创建开始菜单/桌面快捷方式，简体中文界面）。
+- `dist/DeepSeek-Harness-Setup-0.1.1.exe` —— NSIS 安装向导（每用户安装，无需管理员权限，可选择安装目录，自动创建开始菜单/桌面快捷方式，简体中文界面）。
 - 卸载方式（任选其一）：开始菜单 →「卸载 DeepSeek Harness」；Windows 设置 → 应用 → 已安装的应用 → DeepSeek Harness → 卸载；或运行安装目录中的 `Uninstall DeepSeekHarness.exe`。卸载不会删除 `~/.dsh` 中的会话与配置数据。
 - 已实测：静默安装 → 启动（内置 DSH 服务正常拉起、窗口指向解析出的本地地址）→ 静默卸载（目录、开始菜单/桌面快捷方式、注册表项全部清理）。
 

@@ -1,10 +1,10 @@
 # Local development dependencies and generated build output
-dsh-desktop/node_modules/
-dsh-desktop/dist/
+node_modules/
+dist/
 
 # Local test/install scratch data
-dsh-desktop/ui-check-install/
-dsh-desktop/.dsh/
+ui-check-install/
+.dsh/
 
 # User credentials and environment files
 **/.credentials.yaml

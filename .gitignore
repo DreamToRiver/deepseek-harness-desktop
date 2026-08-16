@@ -1,0 +1,20 @@
+# Local development dependencies and generated build output
+dsh-desktop/node_modules/
+dsh-desktop/dist/
+
+# Local test/install scratch data
+dsh-desktop/ui-check-install/
+dsh-desktop/.dsh/
+
+# User credentials and environment files
+**/.credentials.yaml
+**/.env
+**/.env.local
+
+# Local logs and editor/system files
+**/logs/
+.DS_Store
+Thumbs.db
+
+# The installer is published as a GitHub Release asset, not as a repository blob.
+/DeepSeek-Harness-Setup-*.exe
